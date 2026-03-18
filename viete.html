@@ -1,0 +1,1429 @@
+<!DOCTYPE html>
+<html lang="hu">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Viète-tétel - Polinomok és Egyenletek Mestere</title>
+    <style>
+        /* ===========================
+           VARIABLES & ROOT STYLES
+           =========================== */
+
+        :root {
+            --primary-blue: #2563eb;
+            --secondary-blue: #1e40af;
+            --accent-gold: #f59e0b;
+            --success-green: #10b981;
+            --danger-red: #dc2626;
+            --dark-bg: #0f172a;
+            --light-bg: #f8fafc;
+            --text-dark: #1e293b;
+            --text-light: #64748b;
+            --border-color: #e2e8f0;
+            
+            --transition: all 0.3s cubic-bezier(0.25, 0.46, 0.45, 0.94);
+            --transition-slow: all 0.6s cubic-bezier(0.25, 0.46, 0.45, 0.94);
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        html {
+            scroll-behavior: smooth;
+        }
+
+        body {
+            font-family: 'Segoe UI', 'Trebuchet MS', sans-serif;
+            color: var(--text-dark);
+            background-color: var(--light-bg);
+            line-height: 1.6;
+            overflow-x: hidden;
+        }
+
+        /* Typography */
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 0 20px;
+        }
+
+        h1, h2, h3, h4, h5, h6 {
+            font-family: 'Segoe UI', sans-serif;
+            font-weight: 700;
+            letter-spacing: 0.5px;
+        }
+
+        h2 {
+            font-size: 2.5rem;
+            margin-bottom: 2rem;
+        }
+
+        h3 {
+            font-size: 1.4rem;
+            margin-bottom: 1rem;
+        }
+
+        p {
+            font-size: 1.05rem;
+            color: var(--text-light);
+            margin-bottom: 1rem;
+        }
+
+        /* Navigation */
+        .navbar {
+            position: fixed;
+            top: 0;
+            width: 100%;
+            background: rgba(248, 250, 252, 0.95);
+            backdrop-filter: blur(10px);
+            padding: 1.5rem 0;
+            box-shadow: 0 4px 20px rgba(37, 99, 235, 0.1);
+            z-index: 1000;
+        }
+
+        .navbar .container {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .logo {
+            font-size: 1.6rem;
+            font-weight: 800;
+            color: var(--primary-blue);
+            letter-spacing: 1px;
+            background: linear-gradient(135deg, var(--primary-blue), var(--accent-gold));
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+
+        .nav-links {
+            display: flex;
+            list-style: none;
+            gap: 2.5rem;
+        }
+
+        .nav-links a {
+            text-decoration: none;
+            color: var(--text-dark);
+            font-weight: 600;
+            font-size: 0.95rem;
+            position: relative;
+            transition: var(--transition);
+        }
+
+        .nav-links a::after {
+            content: '';
+            position: absolute;
+            bottom: -8px;
+            left: 0;
+            width: 0;
+            height: 2px;
+            background: linear-gradient(90deg, var(--primary-blue), var(--accent-gold));
+            transition: var(--transition);
+        }
+
+        .nav-links a:hover {
+            color: var(--primary-blue);
+        }
+
+        .nav-links a:hover::after {
+            width: 100%;
+        }
+
+        /* Hero */
+        .hero {
+            position: relative;
+            height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin-top: 60px;
+            overflow: hidden;
+        }
+
+        .hero-background {
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: linear-gradient(135deg, var(--dark-bg) 0%, var(--secondary-blue) 50%, var(--primary-blue) 100%);
+            z-index: -1;
+            animation: gradientFlow 15s ease infinite;
+        }
+
+        @keyframes gradientFlow {
+            0%, 100% {
+                background: linear-gradient(135deg, var(--dark-bg) 0%, var(--secondary-blue) 50%, var(--primary-blue) 100%);
+            }
+            50% {
+                background: linear-gradient(135deg, var(--primary-blue) 0%, var(--dark-bg) 50%, var(--secondary-blue) 100%);
+            }
+        }
+
+        .hero-content {
+            text-align: center;
+            z-index: 1;
+            animation: fadeInUp 1s ease-out;
+        }
+
+        .hero-subtitle-top {
+            font-size: 0.9rem;
+            color: var(--accent-gold);
+            letter-spacing: 3px;
+            text-transform: uppercase;
+            font-weight: 700;
+            margin-bottom: 1rem;
+            animation: slideDown 0.8s ease-out;
+        }
+
+        .hero-title {
+            font-size: 5.5rem;
+            color: #fff;
+            margin-bottom: 1rem;
+            letter-spacing: 2px;
+            text-shadow: 4px 4px 8px rgba(0, 0, 0, 0.3);
+            animation: slideDown 0.8s ease-out 0.1s both;
+            font-weight: 800;
+        }
+
+        .hero-subtitle {
+            font-size: 1.6rem;
+            color: rgba(255, 255, 255, 0.95);
+            letter-spacing: 1px;
+            margin-bottom: 2rem;
+            animation: slideUp 0.8s ease-out 0.2s both;
+        }
+
+        .hero-divider {
+            width: 120px;
+            height: 4px;
+            background: linear-gradient(90deg, var(--accent-gold), transparent);
+            margin: 2rem auto;
+            animation: expandWidth 0.8s ease-out 0.4s both;
+        }
+
+        .hero-accent {
+            width: 100px;
+            height: 100px;
+            border: 2px solid rgba(245, 158, 11, 0.3);
+            border-radius: 50%;
+            margin-top: 2rem;
+            animation: pulse 3s ease-in-out infinite;
+        }
+
+        @keyframes fadeInUp {
+            from { opacity: 0; transform: translateY(50px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        @keyframes slideDown {
+            from { opacity: 0; transform: translateY(-50px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        @keyframes slideUp {
+            from { opacity: 0; transform: translateY(30px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        @keyframes expandWidth {
+            from { width: 0; }
+            to { width: 120px; }
+        }
+
+        @keyframes pulse {
+            0%, 100% { transform: scale(1); opacity: 0.5; }
+            50% { transform: scale(1.1); opacity: 0.3; }
+        }
+
+        /* Sections */
+        .section {
+            padding: 6rem 0;
+            position: relative;
+        }
+
+        .section-title {
+            text-align: center;
+            color: var(--primary-blue);
+            position: relative;
+            padding-bottom: 1.5rem;
+            animation: fadeInDown 0.8s ease-out;
+        }
+
+        .section-title::after {
+            content: '';
+            position: absolute;
+            bottom: 0;
+            left: 50%;
+            transform: translateX(-50%);
+            width: 100px;
+            height: 3px;
+            background: linear-gradient(90deg, var(--primary-blue), var(--accent-gold));
+            border-radius: 2px;
+        }
+
+        @keyframes fadeInDown {
+            from { opacity: 0; transform: translateY(-30px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; }
+            to { opacity: 1; }
+        }
+
+        @keyframes slideInUp {
+            from { opacity: 0; transform: translateY(30px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        /* About Section */
+        .about-section {
+            background: linear-gradient(180deg, var(--light-bg) 0%, rgba(37, 99, 235, 0.05) 100%);
+        }
+
+        .about-content {
+            display: grid;
+            grid-template-columns: 1.2fr 0.8fr;
+            gap: 3rem;
+            align-items: center;
+        }
+
+        .about-text {
+            animation: slideInLeft 0.8s ease-out 0.3s both;
+        }
+
+        @keyframes slideInLeft {
+            from { opacity: 0; transform: translateX(-30px); }
+            to { opacity: 1; transform: translateX(0); }
+        }
+
+        .about-text p {
+            margin-bottom: 1.5rem;
+            font-size: 1.1rem;
+        }
+
+        .highlight-box {
+            background: white;
+            padding: 2rem;
+            border-radius: 12px;
+            border-left: 5px solid var(--primary-blue);
+            margin: 2rem 0;
+            box-shadow: 0 4px 15px rgba(37, 99, 235, 0.1);
+            animation: slideInUp 0.8s ease-out 0.4s both;
+        }
+
+        .highlight-box h3 {
+            color: var(--primary-blue);
+            margin-bottom: 1rem;
+        }
+
+        .highlight-box ul {
+            list-style: none;
+            padding: 0;
+        }
+
+        .highlight-box li {
+            padding: 0.5rem 0;
+            padding-left: 2rem;
+            position: relative;
+            color: var(--text-light);
+        }
+
+        .highlight-box li::before {
+            content: '✓';
+            position: absolute;
+            left: 0;
+            color: var(--success-green);
+            font-weight: bold;
+            font-size: 1.2rem;
+        }
+
+        .about-illustration {
+            animation: slideInRight 0.8s ease-out 0.3s both;
+        }
+
+        @keyframes slideInRight {
+            from { opacity: 0; transform: translateX(30px); }
+            to { opacity: 1; transform: translateX(0); }
+        }
+
+        .viete-portrait {
+            width: 100%;
+            max-width: 300px;
+            filter: drop-shadow(0 10px 30px rgba(37, 99, 235, 0.2));
+            animation: float 4s ease-in-out infinite;
+        }
+
+        @keyframes float {
+            0%, 100% { transform: translateY(0px); }
+            50% { transform: translateY(-15px); }
+        }
+
+        /* Theorem Section */
+        .theorem-section {
+            background: linear-gradient(180deg, rgba(37, 99, 235, 0.05) 0%, var(--light-bg) 100%);
+        }
+
+        .theorem-intro {
+            text-align: center;
+            font-size: 1.2rem;
+            margin-bottom: 3rem;
+            animation: fadeIn 0.8s ease-out 0.3s both;
+        }
+
+        .theorem-intro p {
+            color: var(--text-dark);
+            font-weight: 500;
+        }
+
+        .formulas-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 2rem;
+            margin-bottom: 4rem;
+        }
+
+        .formula-card {
+            background: white;
+            padding: 2.5rem;
+            border-radius: 12px;
+            box-shadow: 0 8px 25px rgba(37, 99, 235, 0.1);
+            border-top: 4px solid var(--primary-blue);
+            animation: scaleIn 0.6s ease-out backwards;
+            position: relative;
+            transition: var(--transition);
+        }
+
+        .formula-card:hover {
+            transform: translateY(-8px);
+            box-shadow: 0 12px 35px rgba(37, 99, 235, 0.15);
+        }
+
+        .formula-card:nth-child(1) { animation-delay: 0.1s; }
+        .formula-card:nth-child(2) { animation-delay: 0.2s; }
+
+        @keyframes scaleIn {
+            from { opacity: 0; transform: scale(0.9) translateY(20px); }
+            to { opacity: 1; transform: scale(1) translateY(0); }
+        }
+
+        .formula-number {
+            position: absolute;
+            top: -15px;
+            right: 30px;
+            width: 50px;
+            height: 50px;
+            background: linear-gradient(135deg, var(--primary-blue), var(--accent-gold));
+            color: white;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.5rem;
+            font-weight: bold;
+            box-shadow: 0 4px 15px rgba(37, 99, 235, 0.3);
+        }
+
+        .formula-card h3 {
+            color: var(--primary-blue);
+            margin-top: 0.5rem;
+        }
+
+        .formula-box {
+            background: linear-gradient(135deg, rgba(37, 99, 235, 0.1), rgba(245, 158, 11, 0.1));
+            padding: 1.5rem;
+            border-radius: 8px;
+            margin: 1.5rem 0;
+            border: 1px solid rgba(37, 99, 235, 0.2);
+        }
+
+        .formula {
+            font-size: 1.8rem;
+            font-weight: bold;
+            color: var(--primary-blue);
+            font-family: 'Courier New', monospace;
+            display: block;
+        }
+
+        .formula-card p {
+            font-size: 0.95rem;
+            color: var(--text-light);
+        }
+
+        .general-form {
+            background: white;
+            padding: 2.5rem;
+            border-radius: 12px;
+            box-shadow: 0 8px 25px rgba(37, 99, 235, 0.1);
+            margin-bottom: 3rem;
+            animation: slideInUp 0.8s ease-out 0.4s both;
+        }
+
+        .general-form h3 {
+            color: var(--primary-blue);
+        }
+
+        .formulas-grid-2 {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 1.5rem;
+            margin-top: 1.5rem;
+        }
+
+        .formula-card-small {
+            background: linear-gradient(135deg, rgba(37, 99, 235, 0.05), rgba(245, 158, 11, 0.05));
+            padding: 1.5rem;
+            border-radius: 8px;
+            border: 2px solid rgba(37, 99, 235, 0.2);
+            text-align: center;
+        }
+
+        .formula-card-small .formula {
+            font-size: 1.5rem;
+        }
+
+        .theorem-visualization {
+            background: white;
+            padding: 2.5rem;
+            border-radius: 12px;
+            box-shadow: 0 8px 25px rgba(37, 99, 235, 0.1);
+            animation: slideInUp 0.8s ease-out 0.5s both;
+        }
+
+        .theorem-visualization h3 {
+            color: var(--primary-blue);
+            margin-bottom: 2rem;
+        }
+
+        .viete-diagram {
+            width: 100%;
+            max-width: 600px;
+            margin: 0 auto;
+            filter: drop-shadow(0 4px 10px rgba(37, 99, 235, 0.1));
+            animation: flowIn 1s ease-out;
+        }
+
+        @keyframes flowIn {
+            from { opacity: 0; transform: scale(0.9); }
+            to { opacity: 1; transform: scale(1); }
+        }
+
+        /* Properties Section */
+        .properties-section {
+            background: linear-gradient(180deg, var(--light-bg) 0%, rgba(37, 99, 235, 0.05) 100%);
+        }
+
+        .properties-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 2rem;
+        }
+
+        .property-card {
+            background: white;
+            padding: 2rem;
+            border-radius: 12px;
+            box-shadow: 0 6px 20px rgba(0, 0, 0, 0.08);
+            animation: popIn 0.6s cubic-bezier(0.34, 1.56, 0.64, 1) backwards;
+            transition: var(--transition);
+            position: relative;
+            overflow: hidden;
+        }
+
+        .property-card::before {
+            content: '';
+            position: absolute;
+            top: -50%;
+            right: -50%;
+            width: 200px;
+            height: 200px;
+            background: radial-gradient(circle, rgba(37, 99, 235, 0.1), transparent);
+            border-radius: 50%;
+            transition: var(--transition);
+        }
+
+        .property-card:hover {
+            transform: translateY(-8px);
+            box-shadow: 0 12px 35px rgba(37, 99, 235, 0.15);
+        }
+
+        .property-card:hover::before {
+            top: 0;
+            right: 0;
+        }
+
+        .property-1 { animation-delay: 0.1s; border-top: 4px solid #2563eb; }
+        .property-2 { animation-delay: 0.2s; border-top: 4px solid #f59e0b; }
+        .property-3 { animation-delay: 0.3s; border-top: 4px solid #10b981; }
+        .property-4 { animation-delay: 0.4s; border-top: 4px solid #8b5cf6; }
+        .property-5 { animation-delay: 0.5s; border-top: 4px solid #ec4899; }
+        .property-6 { animation-delay: 0.6s; border-top: 4px solid #f97316; }
+
+        @keyframes popIn {
+            from { opacity: 0; transform: scale(0.8) rotateX(-20deg); }
+            to { opacity: 1; transform: scale(1) rotateX(0); }
+        }
+
+        .property-icon {
+            font-size: 2.5rem;
+            margin-bottom: 1rem;
+            transition: var(--transition);
+        }
+
+        .property-card:hover .property-icon {
+            transform: scale(1.2) rotate(-10deg);
+        }
+
+        .property-card h3 {
+            color: var(--text-dark);
+            margin-bottom: 1rem;
+        }
+
+        .property-card p {
+            color: var(--text-light);
+            font-size: 0.95rem;
+        }
+
+        .property-example {
+            background: rgba(37, 99, 235, 0.05);
+            padding: 1rem;
+            border-radius: 6px;
+            margin-top: 1rem;
+            border-left: 3px solid var(--primary-blue);
+            font-size: 0.9rem;
+            color: var(--text-dark);
+        }
+
+        /* Examples Section */
+        .examples-section {
+            background: linear-gradient(180deg, rgba(37, 99, 235, 0.05) 0%, var(--light-bg) 100%);
+        }
+
+        .examples-container {
+            display: grid;
+            gap: 2.5rem;
+        }
+
+        .example-card-large {
+            background: white;
+            padding: 2.5rem;
+            border-radius: 12px;
+            box-shadow: 0 8px 25px rgba(37, 99, 235, 0.1);
+            border-left: 5px solid var(--primary-blue);
+            animation: slideInUp 0.6s ease-out backwards;
+            transition: var(--transition);
+        }
+
+        .example-card-large:hover {
+            box-shadow: 0 12px 35px rgba(37, 99, 235, 0.15);
+            transform: translateX(5px);
+        }
+
+        .example-card-large:nth-child(1) { animation-delay: 0.1s; }
+        .example-card-large:nth-child(2) { animation-delay: 0.2s; }
+        .example-card-large:nth-child(3) { animation-delay: 0.3s; }
+        .example-card-large:nth-child(4) { animation-delay: 0.4s; }
+
+        .example-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 1.5rem;
+            padding-bottom: 1rem;
+            border-bottom: 2px solid rgba(37, 99, 235, 0.2);
+        }
+
+        .example-number {
+            font-size: 1.2rem;
+            font-weight: bold;
+            color: var(--primary-blue);
+        }
+
+        .difficulty {
+            padding: 0.5rem 1rem;
+            border-radius: 20px;
+            font-size: 0.85rem;
+            font-weight: 600;
+            background: rgba(37, 99, 235, 0.1);
+            color: var(--primary-blue);
+        }
+
+        .example-content h3 {
+            color: var(--text-dark);
+            margin-bottom: 1rem;
+        }
+
+        .example-content p {
+            margin-bottom: 1rem;
+            color: var(--text-light);
+        }
+
+        .example-solution {
+            background: linear-gradient(135deg, rgba(37, 99, 235, 0.05), rgba(245, 158, 11, 0.05));
+            padding: 1.5rem;
+            border-radius: 8px;
+            margin-top: 1.5rem;
+            border: 1px solid rgba(37, 99, 235, 0.1);
+        }
+
+        .example-solution h4 {
+            color: var(--primary-blue);
+            margin-bottom: 1rem;
+        }
+
+        .solution-step {
+            background: white;
+            padding: 1rem;
+            border-radius: 6px;
+            margin: 1rem 0;
+            border-left: 4px solid var(--accent-gold);
+        }
+
+        .solution-step p {
+            margin-bottom: 0.5rem;
+            font-family: 'Courier New', monospace;
+            color: var(--text-dark);
+            font-weight: 500;
+        }
+
+        .example-solution em {
+            color: var(--success-green);
+            font-style: italic;
+            display: block;
+            margin-top: 1rem;
+        }
+
+        /* Quiz Section */
+        .quiz-section {
+            background: linear-gradient(180deg, var(--light-bg) 0%, rgba(37, 99, 235, 0.05) 100%);
+        }
+
+        .quiz-container {
+            background: white;
+            padding: 3rem;
+            border-radius: 12px;
+            box-shadow: 0 12px 40px rgba(37, 99, 235, 0.15);
+            animation: slideInUp 0.8s ease-out 0.3s both;
+        }
+
+        #quiz-content {
+            margin-bottom: 2rem;
+        }
+
+        .quiz-question {
+            margin-bottom: 2.5rem;
+            padding-bottom: 2rem;
+            border-bottom: 2px solid var(--border-color);
+            animation: fadeIn 0.6s ease-out;
+        }
+
+        .quiz-question:last-child {
+            border-bottom: none;
+        }
+
+        .question-title {
+            font-weight: 700;
+            color: var(--primary-blue);
+            margin-bottom: 1.5rem;
+            font-size: 1.15rem;
+        }
+
+        .question-options {
+            display: flex;
+            flex-direction: column;
+            gap: 1rem;
+        }
+
+        .option {
+            display: flex;
+            align-items: center;
+            cursor: pointer;
+            padding: 1.2rem;
+            border-radius: 8px;
+            border: 2px solid var(--border-color);
+            transition: var(--transition);
+            background: white;
+        }
+
+        .option:hover {
+            border-color: var(--primary-blue);
+            background: rgba(37, 99, 235, 0.05);
+            transform: translateX(5px);
+        }
+
+        .option input[type="radio"] {
+            cursor: pointer;
+            margin-right: 1rem;
+            accent-color: var(--primary-blue);
+            width: 22px;
+            height: 22px;
+            flex-shrink: 0;
+        }
+
+        .option label {
+            cursor: pointer;
+            flex: 1;
+            margin: 0;
+            font-weight: 500;
+        }
+
+        .submit-btn {
+            background: linear-gradient(135deg, var(--primary-blue), var(--secondary-blue));
+            color: white;
+            border: none;
+            padding: 1.2rem 3rem;
+            font-size: 1.1rem;
+            border-radius: 8px;
+            cursor: pointer;
+            font-weight: 700;
+            transition: var(--transition);
+            width: 100%;
+            letter-spacing: 0.5px;
+            text-transform: uppercase;
+        }
+
+        .submit-btn:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 10px 30px rgba(37, 99, 235, 0.3);
+        }
+
+        .results-container {
+            margin-top: 2.5rem;
+            padding: 2rem;
+            border-radius: 8px;
+            display: none;
+            animation: slideInUp 0.6s ease-out;
+        }
+
+        .results-container.show {
+            display: block;
+        }
+
+        .results-container.success {
+            background: rgba(16, 185, 129, 0.1);
+            border-left: 5px solid var(--success-green);
+            color: #065f46;
+        }
+
+        .results-container.partial {
+            background: rgba(245, 158, 11, 0.1);
+            border-left: 5px solid var(--accent-gold);
+            color: #92400e;
+        }
+
+        .results-title {
+            font-weight: 700;
+            font-size: 1.3rem;
+            margin-bottom: 1.5rem;
+        }
+
+        /* Footer */
+        .footer {
+            background: var(--dark-bg);
+            color: white;
+            padding: 2.5rem 0;
+            text-align: center;
+        }
+
+        .footer p {
+            color: rgba(255, 255, 255, 0.8);
+            margin: 0;
+        }
+
+        /* Responsive */
+        @media (max-width: 768px) {
+            .hero-title { font-size: 3rem; }
+            .hero-subtitle { font-size: 1.1rem; }
+            .nav-links { gap: 1.2rem; font-size: 0.85rem; }
+            .about-content { grid-template-columns: 1fr; }
+            .section-title { font-size: 1.8rem; }
+            .properties-grid { grid-template-columns: 1fr; }
+            .quiz-container { padding: 1.5rem; }
+        }
+
+        @media (max-width: 480px) {
+            .hero-title { font-size: 2rem; }
+            .nav-links { display: none; }
+            .section { padding: 3rem 0; }
+        }
+    </style>
+</head>
+<body>
+    <!-- Navigation -->
+    <nav class="navbar">
+        <div class="container">
+            <div class="logo">Viète-tétel</div>
+            <ul class="nav-links">
+                <li><a href="#about">Bemutatkozás</a></li>
+                <li><a href="#theorem">A Tétel</a></li>
+                <li><a href="#properties">Tulajdonságok</a></li>
+                <li><a href="#examples">Példák</a></li>
+                <li><a href="#quiz">Kvíz</a></li>
+            </ul>
+        </div>
+    </nav>
+
+    <!-- Hero Section -->
+    <section class="hero">
+        <div class="hero-content">
+            <div class="hero-subtitle-top">16. Századi Matematikai Forradalom</div>
+            <h1 class="hero-title">Viète-tétel</h1>
+            <p class="hero-subtitle">Polinomok és Egyenletek Kapcsolata</p>
+            <div class="hero-divider"></div>
+            <div class="hero-accent"></div>
+        </div>
+        <div class="hero-background"></div>
+    </section>
+
+    <!-- About Section -->
+    <section id="about" class="section about-section">
+        <div class="container">
+            <h2 class="section-title">Viète François - Az Algebrista Apa</h2>
+            
+            <div class="about-content">
+                <div class="about-text">
+                    <p><strong>François Viète</strong> (1540-1603) egy francia matematikus volt, aki forradalmasította az algebrát. Ő vezette be az algebrai szimbólumok használatát a polinomok és egyenletek reprezentálásához.</p>
+                    
+                    <div class="highlight-box">
+                        <h3>Fő Hozzájárulásai:</h3>
+                        <ul>
+                            <li>Az algebra szimbolikájának megalkotása</li>
+                            <li>A polinomok és gyökeik közötti kapcsolat felfedezése</li>
+                            <li>A trigonometria fejlesztése</li>
+                            <li>Az egyenletek megoldásának új módszerei</li>
+                            <li>A "Viète-féle szubsztitúció" technika</li>
+                        </ul>
+                    </div>
+
+                    <p>Viète munkája olyan fontos volt, hogy az "algebra apjának" nevezték.</p>
+                </div>
+
+                <div class="about-illustration">
+                    <svg viewBox="0 0 300 400" class="viete-portrait">
+                        <defs>
+                            <linearGradient id="portraitGrad" x1="0%" y1="0%" x2="100%" y2="100%">
+                                <stop offset="0%" style="stop-color:#e8d5c4;stop-opacity:1" />
+                                <stop offset="100%" style="stop-color:#d4b5a0;stop-opacity:1" />
+                            </linearGradient>
+                        </defs>
+                        <rect width="300" height="400" fill="url(#portraitGrad)"/>
+                        <circle cx="150" cy="80" r="45" fill="#c9a880"/>
+                        <ellipse cx="150" cy="60" rx="48" ry="40" fill="#8b6f47"/>
+                        <circle cx="150" cy="85" r="42" fill="#d4a574"/>
+                        <circle cx="135" cy="75" r="5" fill="#333"/>
+                        <circle cx="165" cy="75" r="5" fill="#333"/>
+                        <path d="M 120 100 Q 150 115 180 100" fill="#8b6f47"/>
+                        <path d="M 115 125 L 100 250 L 200 250 L 185 125 Z" fill="#1a472a"/>
+                        <path d="M 130 140 L 125 200" stroke="#0d2818" stroke-width="2"/>
+                        <path d="M 170 140 L 175 200" stroke="#0d2818" stroke-width="2"/>
+                        <ellipse cx="150" cy="125" rx="35" ry="15" fill="#e8d5c4"/>
+                        <ellipse cx="90" cy="180" rx="18" ry="35" fill="#c9a880"/>
+                        <ellipse cx="210" cy="180" rx="18" ry="35" fill="#c9a880"/>
+                        <rect x="65" y="200" width="40" height="50" fill="#8b4513" opacity="0.8"/>
+                        <rect x="67" y="202" width="36" height="46" fill="#d4a574" opacity="0.6"/>
+                        <text x="230" y="100" font-size="28" fill="#1a472a" opacity="0.3">x²</text>
+                        <text x="40" y="120" font-size="28" fill="#1a472a" opacity="0.3">+</text>
+                        <text x="260" y="250" font-size="24" fill="#1a472a" opacity="0.3">=0</text>
+                    </svg>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Theorem Section -->
+    <section id="theorem" class="section theorem-section">
+        <div class="container">
+            <h2 class="section-title">A Viète-Tétel</h2>
+            
+            <div class="theorem-intro">
+                <p>Ha az <strong>x² + px + q = 0</strong> másodfokú egyenletnek van <strong>x₁</strong> és <strong>x₂</strong> gyöke, akkor:</p>
+            </div>
+
+            <div class="formulas-grid">
+                <div class="formula-card">
+                    <div class="formula-number">1</div>
+                    <h3>Gyökök Összege</h3>
+                    <div class="formula-box">
+                        <span class="formula">x₁ + x₂ = -p</span>
+                    </div>
+                    <p>A gyökök összege egyenlő az x² együtthatójának és a lineáris tag együtthatójának hányadosa ellentettjével.</p>
+                </div>
+
+                <div class="formula-card">
+                    <div class="formula-number">2</div>
+                    <h3>Gyökök Szorzata</h3>
+                    <div class="formula-box">
+                        <span class="formula">x₁ · x₂ = q</span>
+                    </div>
+                    <p>A gyökök szorzata egyenlő a konstans tag és az x² együtthatójának hányadosával.</p>
+                </div>
+            </div>
+
+            <div class="general-form">
+                <h3>Általános Forma</h3>
+                <p>Ha az <strong>ax² + bx + c = 0</strong> egyenletnek van <strong>x₁</strong> és <strong>x₂</strong> gyöke, ahol a ≠ 0:</p>
+                
+                <div class="formulas-grid-2">
+                    <div class="formula-card-small">
+                        <div class="formula-box">
+                            <span class="formula">x₁ + x₂ = -b/a</span>
+                        </div>
+                    </div>
+                    <div class="formula-card-small">
+                        <div class="formula-box">
+                            <span class="formula">x₁ · x₂ = c/a</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="theorem-visualization">
+                <h3>Vizuális Magyarázat</h3>
+                <svg viewBox="0 0 500 300" class="viete-diagram">
+                    <defs>
+                        <pattern id="grid-viete" width="20" height="20" patternUnits="userSpaceOnUse">
+                            <path d="M 20 0 L 0 0 0 20" fill="none" stroke="#e0e7ff" stroke-width="0.5"/>
+                        </pattern>
+                    </defs>
+                    
+                    <rect width="500" height="300" fill="url(#grid-viete)"/>
+                    <path d="M 50 250 Q 100 50 150 250 Q 200 50 250 250 Q 300 100 350 250 Q 400 150 450 250" 
+                          fill="none" stroke="#2563eb" stroke-width="3"/>
+                    
+                    <line x1="30" y1="260" x2="480" y2="260" stroke="#374151" stroke-width="2"/>
+                    <line x1="40" y1="20" x2="40" y2="280" stroke="#374151" stroke-width="2"/>
+                    
+                    <circle cx="120" cy="260" r="6" fill="#dc2626"/>
+                    <circle cx="280" cy="260" r="6" fill="#dc2626"/>
+                    
+                    <text x="120" y="285" text-anchor="middle" font-size="14" font-weight="bold" fill="#dc2626">x₁</text>
+                    <text x="280" y="285" text-anchor="middle" font-size="14" font-weight="bold" fill="#dc2626">x₂</text>
+                    
+                    <circle cx="200" cy="100" r="5" fill="#10b981"/>
+                    <text x="200" y="80" text-anchor="middle" font-size="12" fill="#10b981" font-weight="bold">Csúcs</text>
+                    
+                    <text x="200" y="30" text-anchor="middle" font-size="14" font-weight="bold" fill="#2563eb">x₁ + x₂: A szimetriavonal helyzete</text>
+                </svg>
+            </div>
+        </div>
+    </section>
+
+    <!-- Properties Section -->
+    <section id="properties" class="section properties-section">
+        <div class="container">
+            <h2 class="section-title">Viète-tétel Tulajdonságai és Szabályai</h2>
+            
+            <div class="properties-grid">
+                <div class="property-card property-1">
+                    <div class="property-icon">🔗</div>
+                    <h3>Gyökök és Együtthatók Kapcsolata</h3>
+                    <p>A tétel közvetlenül kapcsolatot teremt a polinom gyökei és együtthatói között.</p>
+                    <div class="property-example">
+                        <strong>Példa:</strong> Ha x₁ = 2 és x₂ = 3, akkor x² - 5x + 6 = 0
+                    </div>
+                </div>
+
+                <div class="property-card property-2">
+                    <div class="property-icon">⚖️</div>
+                    <h3>Szimmetria Tulajdonsága</h3>
+                    <p>A gyökök összege és szorzata szimmetrikus függvénye a gyökeiknek.</p>
+                    <div class="property-example">
+                        <strong>Megjegyzés:</strong> x₁ + x₂ = x₂ + x₁ (kommutativitás)
+                    </div>
+                </div>
+
+                <div class="property-card property-3">
+                    <div class="property-icon">✓</div>
+                    <h3>Gyökök Helyességének Ellenőrzése</h3>
+                    <p>A Viète-tételt használhatjuk a gyökök helyességének ellenőrzésére.</p>
+                    <div class="property-example">
+                        <strong>Módszer:</strong> Helyettesítsd be és ellenőrizd az összeget és szorzatot
+                    </div>
+                </div>
+
+                <div class="property-card property-4">
+                    <div class="property-icon">🔄</div>
+                    <h3>Fordított Alkalmazás</h3>
+                    <p>Ha ismerjük az x₁ + x₂ és x₁ · x₂ értékeket, felírhatjuk az egyenletet.</p>
+                    <div class="property-example">
+                        <strong>Képlet:</strong> x² - (x₁ + x₂)x + x₁·x₂ = 0
+                    </div>
+                </div>
+
+                <div class="property-card property-5">
+                    <div class="property-icon">📊</div>
+                    <h3>Diszkrimináns Kapcsolat</h3>
+                    <p>A diszkrimináns meghatározza a valós vagy komplex gyökök számát.</p>
+                    <div class="property-example">
+                        <strong>Szabály:</strong> Δ > 0: két valós | Δ = 0: egy | Δ < 0: komplex
+                    </div>
+                </div>
+
+                <div class="property-card property-6">
+                    <div class="property-icon">∞</div>
+                    <h3>Magasabb Fokú Polinomok</h3>
+                    <p>A Viète-tétel kiterjeszthető az n-ed fokú polinomokra.</p>
+                    <div class="property-example">
+                        <strong>Kiterjesztés:</strong> x³ + px² + qx + r = 0 gyökeire is alkalmazható
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Examples Section -->
+    <section id="examples" class="section examples-section">
+        <div class="container">
+            <h2 class="section-title">Gyakorlati Példa Feladatok</h2>
+            
+            <div class="examples-container">
+                <div class="example-card-large">
+                    <div class="example-header">
+                        <div class="example-number">1. Feladat</div>
+                        <div class="difficulty">Könnyű</div>
+                    </div>
+                    <div class="example-content">
+                        <h3>Gyökök Szummájának és Szorzatának Meghatározása</h3>
+                        <p><strong>Feladat:</strong> Az x² - 7x + 12 = 0 egyenlethez add meg a gyökök összegét és szorzatát!</p>
+                        
+                        <div class="example-solution">
+                            <h4>Megoldás:</h4>
+                            <p>Viète-tétel alapján:</p>
+                            <div class="solution-step">
+                                <p><strong>x₁ + x₂ = -(-7) = 7</strong></p>
+                                <p><strong>x₁ · x₂ = 12</strong></p>
+                            </div>
+                            <p><em>Valóban: x₁ = 3, x₂ = 4, mert 3 + 4 = 7 és 3 · 4 = 12 ✓</em></p>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="example-card-large">
+                    <div class="example-header">
+                        <div class="example-number">2. Feladat</div>
+                        <div class="difficulty">Közepes</div>
+                    </div>
+                    <div class="example-content">
+                        <h3>Egyenlet Felírása Gyökökből</h3>
+                        <p><strong>Feladat:</strong> Írj fel egy másodfokú egyenletet, amelynek gyökei x₁ = 5 és x₂ = -2!</p>
+                        
+                        <div class="example-solution">
+                            <h4>Megoldás:</h4>
+                            <p>Viète-tétel fordított alkalmazása:</p>
+                            <div class="solution-step">
+                                <p>x₁ + x₂ = 5 + (-2) = 3</p>
+                                <p>x₁ · x₂ = 5 · (-2) = -10</p>
+                                <p><strong>Egyenlet: x² - 3x - 10 = 0</strong></p>
+                            </div>
+                            <p><em>Ellenőrzés: x² - (x₁ + x₂)x + x₁·x₂ = x² - 3x + (-10) = 0 ✓</em></p>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="example-card-large">
+                    <div class="example-header">
+                        <div class="example-number">3. Feladat</div>
+                        <div class="difficulty">Nehéz</div>
+                    </div>
+                    <div class="example-content">
+                        <h3>Általános Forma és Szorzattényezős Alak</h3>
+                        <p><strong>Feladat:</strong> A 2x² - 8x + 6 = 0 egyenlethez alkalmazd a Viète-tételt!</p>
+                        
+                        <div class="example-solution">
+                            <h4>Megoldás:</h4>
+                            <p>Az általános forma: ax² + bx + c = 0, ahol a = 2, b = -8, c = 6</p>
+                            <div class="solution-step">
+                                <p>x₁ + x₂ = -b/a = -(-8)/2 = 8/2 = 4</p>
+                                <p>x₁ · x₂ = c/a = 6/2 = 3</p>
+                                <p><strong>Szorzattényezős alak: 2(x - 1)(x - 3) = 0</strong></p>
+                            </div>
+                            <p><em>Ellenőrzés: 2(x² - 4x + 3) = 2x² - 8x + 6 ✓</em></p>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="example-card-large">
+                    <div class="example-header">
+                        <div class="example-number">4. Feladat</div>
+                        <div class="difficulty">Nehéz</div>
+                    </div>
+                    <div class="example-content">
+                        <h3>Paraméter Meghatározása</h3>
+                        <p><strong>Feladat:</strong> Határozd meg az m paraméter értékét, ha x₁ + x₂ = x₁ · x₂!</p>
+                        
+                        <div class="example-solution">
+                            <h4>Megoldás:</h4>
+                            <p>Az x² - (m+1)x + 2m = 0 egyenlet gyökeire:</p>
+                            <div class="solution-step">
+                                <p>x₁ + x₂ = m + 1</p>
+                                <p>x₁ · x₂ = 2m</p>
+                                <p><strong>m + 1 = 2m</strong></p>
+                                <p><strong>m = 1</strong></p>
+                            </div>
+                            <p><em>Ellenőrzés: Ha m = 1, akkor x² - 2x + 2 = 0 ✓</em></p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Quiz Section -->
+    <section id="quiz" class="section quiz-section">
+        <div class="container">
+            <h2 class="section-title">Tesztelje Tudását a Viète-Tételről</h2>
+            
+            <div class="quiz-container">
+                <div id="quiz-content"></div>
+                <button id="submit-btn" class="submit-btn">Válaszok Ellenőrzése</button>
+                <div id="results" class="results-container"></div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Footer -->
+    <footer class="footer">
+        <div class="container">
+            <p>&copy; 2024 Viète-tétel Oktatási Weboldal. Matematikai ismeretek alapján készült.</p>
+        </div>
+    </footer>
+
+    <script>
+        // Viète's Theorem Quiz Questions in Hungarian
+        const vieteQuizQuestions = [
+            {
+                id: 1,
+                question: "Mi az x² - 7x + 12 = 0 egyenletben a gyökök összege (Viète-tétel szerint)?",
+                options: ["7", "-7", "12", "-12"],
+                correct: 0
+            },
+            {
+                id: 2,
+                question: "Mi az x² - 7x + 12 = 0 egyenletben a gyökök szorzata (Viète-tétel szerint)?",
+                options: ["7", "-7", "12", "-12"],
+                correct: 2
+            },
+            {
+                id: 3,
+                question: "Ha az ax² + bx + c = 0 egyenlet gyökei x₁ és x₂, akkor x₁ + x₂ = ?",
+                options: ["b/a", "-b/a", "c/a", "-c/a"],
+                correct: 1
+            },
+            {
+                id: 4,
+                question: "Ha az ax² + bx + c = 0 egyenlet gyökei x₁ és x₂, akkor x₁ · x₂ = ?",
+                options: ["b/a", "-b/a", "c/a", "-c/a"],
+                correct: 2
+            },
+            {
+                id: 5,
+                question: "Mely másodfokú egyenletetnek a gyökei x₁ = 2 és x₂ = 3?",
+                options: ["x² + 5x + 6 = 0", "x² - 5x + 6 = 0", "x² - 5x - 6 = 0", "x² + 5x - 6 = 0"],
+                correct: 1
+            },
+            {
+                id: 6,
+                question: "Az x² - 10x + q = 0 egyenletben ha x₁ = 3, akkor q értéke?",
+                options: ["21", "7", "10", "30"],
+                correct: 0
+            },
+            {
+                id: 7,
+                question: "Mely időszakban élt François Viète?",
+                options: ["15. század", "16. század", "17. század", "18. század"],
+                correct: 1
+            },
+            {
+                id: 8,
+                question: "Ha x₁ + x₂ = 8 és x₁ · x₂ = 15, akkor a másodfokú egyenlet?",
+                options: ["x² + 8x + 15 = 0", "x² - 8x + 15 = 0", "x² + 8x - 15 = 0", "x² - 8x - 15 = 0"],
+                correct: 1
+            },
+            {
+                id: 9,
+                question: "A Viète-tétel fordított alkalmazása lényege?",
+                options: ["Gyökökből az egyenlet felírása", "Egyenletből a gyökök meghatározása", "Diszkrimináns számítása", "Szorzattényezős alak felírása"],
+                correct: 0
+            },
+            {
+                id: 10,
+                question: "Az x² + px + 6 = 0 egyenlet gyökeire x₁ + x₂ = 5, akkor p = ?",
+                options: ["5", "-5", "6", "-6"],
+                correct: 1
+            }
+        ];
+
+        // Initialize Quiz
+        function initializeQuiz() {
+            const quizContent = document.getElementById('quiz-content');
+            const submitBtn = document.getElementById('submit-btn');
+            
+            quizContent.innerHTML = '';
+            
+            vieteQuizQuestions.forEach((q, index) => {
+                const questionDiv = document.createElement('div');
+                questionDiv.className = 'quiz-question';
+                questionDiv.setAttribute('data-question-id', q.id);
+                
+                let optionsHTML = '';
+                q.options.forEach((option, optionIndex) => {
+                    optionsHTML += `
+                        <label class="option">
+                            <input type="radio" name="question-${q.id}" value="${optionIndex}" required>
+                            <label>${option}</label>
+                        </label>
+                    `;
+                });
+                
+                questionDiv.innerHTML = `
+                    <div class="question-title">Kérdés ${index + 1}: ${q.question}</div>
+                    <div class="question-options">
+                        ${optionsHTML}
+                    </div>
+                `;
+                
+                quizContent.appendChild(questionDiv);
+            });
+            
+            submitBtn.addEventListener('click', checkAnswers);
+            
+            const questions = document.querySelectorAll('.quiz-question');
+            questions.forEach((q, index) => {
+                q.style.opacity = '0';
+                q.style.animation = `fadeIn 0.6s ease-out ${index * 0.1}s forwards`;
+            });
+        }
+
+        // Check Answers
+        function checkAnswers() {
+            const resultsContainer = document.getElementById('results');
+            let correctAnswers = 0;
+            let totalQuestions = vieteQuizQuestions.length;
+            let detailedResults = [];
+            
+            vieteQuizQuestions.forEach(q => {
+                const selectedOption = document.querySelector(`input[name="question-${q.id}"]:checked`);
+                
+                if (selectedOption) {
+                    const userAnswer = parseInt(selectedOption.value);
+                    const isCorrect = userAnswer === q.correct;
+                    
+                    if (isCorrect) {
+                        correctAnswers++;
+                    }
+                    
+                    detailedResults.push({
+                        question: q.question,
+                        userAnswer: q.options[userAnswer],
+                        correctAnswer: q.options[q.correct],
+                        isCorrect: isCorrect
+                    });
+                } else {
+                    detailedResults.push({
+                        question: q.question,
+                        userAnswer: 'Nem válaszolt',
+                        correctAnswer: q.options[q.correct],
+                        isCorrect: false
+                    });
+                }
+            });
+            
+            const percentage = Math.round((correctAnswers / totalQuestions) * 100);
+            
+            let resultClass = 'success';
+            let resultMessage = '';
+            
+            if (percentage === 100) {
+                resultMessage = `🎉 Kiváló! ${correctAnswers}/${totalQuestions} helyes válasz! Viète volna büszke rád!`;
+                resultClass = 'success';
+            } else if (percentage >= 80) {
+                resultMessage = `⭐ Rendkívüli! ${correctAnswers}/${totalQuestions} helyes (${percentage}%).`;
+                resultClass = 'success';
+            } else if (percentage >= 70) {
+                resultMessage = `✨ Jó munka! ${correctAnswers}/${totalQuestions} helyes (${percentage}%).`;
+                resultClass = 'success';
+            } else if (percentage >= 50) {
+                resultMessage = `👍 Rendben! ${correctAnswers}/${totalQuestions} helyes (${percentage}%). Még tanulj!`;
+                resultClass = 'partial';
+            } else {
+                resultMessage = `📚 Tanulmányozd az anyagot! ${correctAnswers}/${totalQuestions} helyes (${percentage}%).`;
+                resultClass = 'partial';
+            }
+            
+            let detailsHTML = `
+                <div class="results-title">${resultMessage}</div>
+                <div style="margin-top: 1.5rem;">
+                    <div style="font-weight: bold; margin-bottom: 1.5rem; color: var(--text-dark); font-size: 1.05rem;">Részletes Eredmények:</div>
+            `;
+            
+            detailedResults.forEach((result, index) => {
+                const statusIcon = result.isCorrect ? '✓' : '✗';
+                const statusColor = result.isCorrect ? '#10b981' : '#dc2626';
+                
+                detailsHTML += `
+                    <div style="margin-bottom: 1.5rem; padding: 1.2rem; background: ${result.isCorrect ? 'rgba(16, 185, 129, 0.05)' : 'rgba(220, 38, 38, 0.05)'}; border-radius: 8px; border-left: 4px solid ${statusColor};">
+                        <div style="font-weight: bold; margin-bottom: 0.8rem; color: var(--text-dark);">
+                            <span style="color: ${statusColor}; font-size: 1.2rem; margin-right: 0.5rem;">${statusIcon}</span>
+                            Kérdés ${index + 1}: ${result.question}
+                        </div>
+                        <div style="margin-left: 1.8rem; color: var(--text-light);">
+                            <div style="margin-bottom: 0.5rem;">
+                                <strong>Te:</strong> <span style="color: var(--text-dark);">${result.userAnswer}</span>
+                            </div>
+                            ${!result.isCorrect ? `<div style="color: ${statusColor};"><strong>Helyes:</strong> <span style="color: var(--text-dark);">${result.correctAnswer}</span></div>` : ''}
+                        </div>
+                    </div>
+                `;
+            });
+            
+            detailsHTML += `
+                <div style="margin-top: 2rem; padding: 1.5rem; background: rgba(37, 99, 235, 0.1); border-radius: 8px; border: 1px solid rgba(37, 99, 235, 0.2); text-align: center;">
+                    <div style="font-weight: bold; color: var(--primary-blue); font-size: 1.1rem;">
+                        Végeredmény: ${correctAnswers}/${totalQuestions} (${percentage}%)
+                    </div>
+                </div>
+            `;
+            
+            detailsHTML += '</div>';
+            
+            resultsContainer.innerHTML = detailsHTML;
+            resultsContainer.className = `results-container show ${resultClass}`;
+            
+            setTimeout(() => {
+                resultsContainer.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+            }, 100);
+        }
+
+        // Smooth scrolling
+        document.querySelectorAll('a[href^="#"]').forEach(anchor => {
+            anchor.addEventListener('click', function (e) {
+                const href = this.getAttribute('href');
+                if (href !== '#') {
+                    e.preventDefault();
+                    const target = document.querySelector(href);
+                    if (target) {
+                        target.scrollIntoView({
+                            behavior: 'smooth',
+                            block: 'start'
+                        });
+                    }
+                }
+            });
+        });
+
+        // Initialize on page load
+        document.addEventListener('DOMContentLoaded', function() {
+            initializeQuiz();
+            console.log('%c📐 Viète-Tétel Weboldal', 'font-size: 20px; font-weight: bold; color: #2563eb;');
+            console.log('%cMagyar nyelvű matematika tanulás', 'font-size: 14px; color: #f59e0b;');
+        });
+    </script>
+</body>
+</html>
